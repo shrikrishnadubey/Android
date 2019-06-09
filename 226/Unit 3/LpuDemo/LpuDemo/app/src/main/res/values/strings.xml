@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LpuDemo</string>
+    <string name="title_activity_custom">custom</string>
+    <string name="title_activity_testactvity">testactvity</string>
+</resources>
