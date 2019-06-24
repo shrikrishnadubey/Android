@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Alertbox</string>
+    <string-array name="Language">
+        <item>C</item>
+        <item>C++</item>
+        <item>java</item>
+        <item>AI</item>
+    </string-array>
+</resources>
