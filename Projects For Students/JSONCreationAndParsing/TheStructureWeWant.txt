@@ -1,0 +1,19 @@
+//----This file is just for reference to show you how the final JSON will look like.
+
+{
+	"MyObject":
+	{
+		"Name":"Temp",
+		"Code":27
+	},
+	"First":1,
+	"Second":"Two",
+	"Third":false,
+	"MyArray":
+	[
+		1,
+		2,
+		3
+	]
+
+}

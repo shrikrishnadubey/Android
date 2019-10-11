@@ -1,0 +1,105 @@
+package com.example.antisaby.mysensorapp;
+
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity implements SensorEventListener
+{
+    private TextView mTvLight, mTvProx, mTvAcc, mTvMag, mTvRotation;
+    private SensorManager mSensorManager;
+    private float[] mAccValues = new float[3], mMagValues = new float[3];
+
+    private Sensor mSensorProximity, mSensorLight, mSensorAcc, mSensorMagnet;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mTvProx = findViewById(R.id.tvProximity);
+        mTvAcc = findViewById(R.id.tvAcc);
+        mTvLight = findViewById(R.id.tvLight);
+        mTvMag = findViewById(R.id.tvMagnet);
+        mTvRotation = findViewById(R.id.tvRotation);
+
+        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        mSensorLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        mSensorProximity = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        mSensorAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensorMagnet = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent)
+    {
+        int sensorType = sensorEvent.sensor.getType();
+        float[] values  = sensorEvent.values;
+
+        switch (sensorType)
+        {
+            case Sensor.TYPE_LIGHT:
+                mTvLight.setText("\nLight Sensor: " + values[0]);
+                break;
+            case Sensor.TYPE_PROXIMITY:
+                mTvProx.setText("\nProximity Sensor: " + values[0]);
+                break;
+            case Sensor.TYPE_ACCELEROMETER:
+                mAccValues = values.clone();
+                break;
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                mMagValues = values.clone();
+                break;
+        }
+
+        float[] rotationMatrix = new float[9];
+        boolean rotationOK = SensorManager.getRotationMatrix(rotationMatrix, null, mAccValues, mMagValues);
+
+        if(rotationOK)
+        {
+            float orientation[] = new float[3];
+            SensorManager.getOrientation(rotationMatrix, orientation);
+            float azimut = orientation[0];
+            float pitch = orientation[1];
+            float roll = orientation[2];
+            mTvRotation.setText("Azimut: " + azimut + "\nPitch: " + pitch +"\nRoll: " + roll);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy)
+    {
+
+    }
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+        if (mSensorLight != null)
+            mSensorManager.registerListener(this, mSensorLight, SensorManager.SENSOR_DELAY_NORMAL);
+
+        if (mSensorProximity != null)
+            mSensorManager.registerListener(this, mSensorProximity, SensorManager.SENSOR_DELAY_NORMAL);
+
+        if (mSensorAcc != null)
+            mSensorManager.registerListener(this, mSensorAcc, SensorManager.SENSOR_DELAY_NORMAL);
+
+        if (mSensorMagnet != null)
+            mSensorManager.registerListener(this, mSensorMagnet, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        mSensorManager.unregisterListener(this);
+    }
+
+}

@@ -1,0 +1,1 @@
+This program applies translate, alpha(transparency), rotation and scale animations to a TextView on click of a Button. "my_anim.xml" goes in "res/anim" folder. To create "anim" folder, right click "res" folder and select New > Android Resource Directory option. Then, select "anim" option from the dropdown.

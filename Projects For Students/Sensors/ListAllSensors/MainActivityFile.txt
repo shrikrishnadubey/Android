@@ -1,0 +1,36 @@
+package com.example.antisaby.sensorslist;
+
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.widget.TextView;
+
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity
+{
+    private TextView mTvSensorsList;
+    private SensorManager mSensorManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mTvSensorsList = findViewById(R.id.tvAllSensors);
+
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        List<Sensor> sensorList  = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+        String sensorText = "";
+
+        for (Sensor currentSensor : sensorList )
+        {
+            sensorText += currentSensor.getName() + "\n";
+        }
+
+        mTvSensorsList.setText(sensorText);
+
+    }
+}

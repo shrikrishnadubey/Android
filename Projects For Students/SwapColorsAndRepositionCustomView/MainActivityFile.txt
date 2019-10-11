@@ -1,0 +1,67 @@
+package com.example.antisaby.newcanvas;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+
+public class MainActivity extends AppCompatActivity
+{
+    private boolean mTimerElapsed = false;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        final CustomView customView = new CustomView(this);
+        setContentView(customView);
+
+        final Handler handler = new Handler();
+        final Runnable changeColor = new Runnable()
+        {
+            public void run()
+            {
+                mTimerElapsed = true;
+                customView.invalidate();
+            }
+        };
+        handler.postDelayed(changeColor, 5000);
+    }
+
+
+    public class CustomView extends View
+    {
+        private Paint mPntBlue, mPntRed;
+
+        public CustomView(Context context)
+        {
+            super(context);
+            mPntBlue = new Paint();
+            mPntRed = new Paint();
+            mPntBlue.setStyle(Paint.Style.FILL);
+            mPntRed.setStyle(Paint.Style.FILL);
+            mPntBlue.setColor(Color.BLUE);
+            mPntRed.setColor(Color.RED);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas)
+        {
+            if(mTimerElapsed)
+            {
+                canvas.drawColor(Color.RED);
+                canvas.drawCircle(200, 200, 100, mPntBlue);
+            }
+            else
+            {
+                canvas.drawColor(Color.BLUE);
+                canvas.drawCircle(500, 500, 100, mPntRed);
+            }
+        }
+    }
+
+}

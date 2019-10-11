@@ -1,0 +1,131 @@
+package com.example.antisaby.bluetoothtest;
+
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Set;
+
+public class MainActivity extends AppCompatActivity
+{
+    private Button mBtnTurnOnBluetooth, mBtnGetVisibleDevices, mBtnListPairedDevices;
+    private Button mBtnTurnOffBluetooth, mBtnMakeDiscoverable;
+    private BluetoothAdapter mBluetoothAdapter;
+    private Set<BluetoothDevice> mListPairedDevices;
+    private ListView mLvPaired;
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        mBtnTurnOffBluetooth = findViewById(R.id.btnTurnOffBluetooth);
+        mBtnTurnOnBluetooth = findViewById(R.id.btnTurnOnBluetooth);
+        mBtnGetVisibleDevices = findViewById(R.id.btnGetVisibleDevices);
+        mBtnListPairedDevices = findViewById(R.id.btnListPairedDevices);
+        mBtnMakeDiscoverable = findViewById(R.id.btnMakeDiscoverable);
+        mLvPaired = findViewById(R.id.lvPaired);
+
+        ActivityCompat.requestPermissions(this,
+                new String[]
+                {
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                }, 1);
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(mReceiver, filter);
+    }
+
+    public void turnOnBluetooth(View v)
+    {
+        if(mBluetoothAdapter == null)
+            return;
+
+        if (!mBluetoothAdapter.isEnabled())
+        {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+            Toast.makeText(getApplicationContext(), "Turned on",Toast.LENGTH_LONG).show();
+        }
+        else
+            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+    }
+
+    public void turnOffBluetooth(View v)
+    {
+        if(mBluetoothAdapter == null)
+            return;
+
+        mBluetoothAdapter.disable();
+        Toast.makeText(getApplicationContext(), "Turned off" ,Toast.LENGTH_LONG).show();
+    }
+
+
+    public  void makeDiscoverable(View v)
+    {
+        if(mBluetoothAdapter == null)
+            return;
+
+        Intent getVisible = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        startActivityForResult(getVisible, 0);
+    }
+
+    public void startDiscovery(View view)
+    {
+        mBluetoothAdapter.startDiscovery();
+    }
+
+    public void listPairedDevices(View v)
+    {
+        if(mBluetoothAdapter == null)
+            return;
+
+        mListPairedDevices = mBluetoothAdapter.getBondedDevices();
+        ArrayList list = new ArrayList();
+        for(BluetoothDevice bt : mListPairedDevices)
+            list.add(bt.getName());
+        Toast.makeText(getApplicationContext(), "Showing Paired Devices",Toast.LENGTH_SHORT).show();
+        final ArrayAdapter adapter = new  ArrayAdapter(this,android.R.layout.simple_list_item_1, list);
+        mLvPaired.setAdapter(adapter);
+    }
+
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver()
+    {
+        public void onReceive(Context context, Intent intent)
+        {
+            Log.d("MainActivity", "Receiving Disc");
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action))
+            {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String deviceName = device.getName();
+                String deviceHardwareAddress = device.getAddress(); // MAC address
+                Toast.makeText(MainActivity.this, deviceName, Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        mBluetoothAdapter.cancelDiscovery();
+        unregisterReceiver(mReceiver);
+    }
+}

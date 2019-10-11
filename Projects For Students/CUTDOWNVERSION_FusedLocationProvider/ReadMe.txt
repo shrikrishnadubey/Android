@@ -1,0 +1,1 @@
+This is the cutdown version of FusedProvider program. Take this MapsActivity.java file and refer to the original uplaoded FusedLocationAndGoogleMaps project for other files.
